@@ -10,6 +10,14 @@ const authenticateToken = require('./middleware/authenticateToken');
 app.use(express.json());
 app.use(cors());
 
+// Serve admin static files
+app.use('/admin', (req, res, next) => {
+  // Example: check for admin token in cookies or headers
+  // If not authenticated, redirect to login or show error
+  // For static files, this is optional unless you want to restrict access
+  next();
+}, express.static(path.join(__dirname, 'admin-dist')));
+
 // Database connection with MongoDB
 mongoose.connect("mongodb+srv://basilroy:basilroy@cluster0.ubfflww.mongodb.net/e-commerce")
 
@@ -124,10 +132,8 @@ app.post('/removeproduct', async (req, res) => {
 app.get("/allproducts", async (req, res) => {
     try {
         let products = await Product.find({});
-        console.log("Products fetched");
-        res.send(products);
+        res.json(products);
     } catch (error) {
-        console.error("Error fetching products:", error);
         res.status(500).json({ success: false, message: "Error fetching products" });
     }
 });
@@ -135,20 +141,21 @@ app.get("/allproducts", async (req, res) => {
 
 //Schemaa creating for user model
 
-const Users = mongoose.model('Users',{
-firstName: { type: String, default: '' },
-lastName: { type: String, default: '' },
-profilePicture: { type: String, default: '' },
-email: { type: String, unique: true },
-username: { type: String, default: '' },
-password: { type: String },
-city: { type: String, default: '' },
-phonenumber: { type: String, default: '' },
-dateOfBirth: { type: String, default: '' },
-gender: { type: String, default: '' },
-additionalFeatures: { type: String, default: '' },
-cartData: { type: Object },
-date: { type: Date, default: Date.now },
+const Users = mongoose.model('Users', {
+  firstName: { type: String, default: '' },
+  lastName: { type: String, default: '' },
+  profilePicture: { type: String, default: '' },
+  email: { type: String, unique: true },
+  username: { type: String, default: '' },
+  password: { type: String },
+  city: { type: String, default: '' },
+  phonenumber: { type: String, default: '' },
+  dateOfBirth: { type: String, default: '' },
+  gender: { type: String, default: '' },
+  additionalFeatures: { type: String, default: '' },
+  cartData: { type: Object },
+  date: { type: Date, default: Date.now },
+  isAdmin: { type: Boolean, default: false }, // <-- Add this line
 })
 
 // Update profile route
@@ -224,28 +231,20 @@ res.json({success:true,token})
 })
 
 //creating endpoint for user login
-app.post('/login',async (req,res)=>{
-let user = await Users.findOne({email:req.body.email})
-if (user) 
-{
-    const passCompare = req.body.password ===user.password
-    if(passCompare){
-        const data ={
-            user:{
-            id:user.id
-        }
+app.post('/login', async (req, res) => {
+  let user = await Users.findOne({ email: req.body.email });
+  if (user) {
+    const passCompare = req.body.password === user.password;
+    if (passCompare) {
+      const data = { user: { id: user.id } };
+      const token = jwt.sign(data, 'secret_ecom');
+      res.json({ success: true, token, isAdmin: user.isAdmin });
+    } else {
+      res.json({ success: false, errors: "Wrong Password" });
     }
-    const token = jwt.sign(data,'secret_ecom');
-    res.json({success:true,token})
-
-}
-else{
-    res.json({success:false,errors:"Wrong Password"})
-}
-}
-else{
-    res.json({success:false,errors:"Wrong Email Id"})
-}
+  } else {
+    res.json({ success: false, errors: "Wrong Email Id" });
+  }
 })
 
 //creating middleware to fetch user
@@ -334,6 +333,14 @@ app.post('/updateproduct', async (req, res) => {
     }
 });
 
+// Define the user schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  isAdmin: { type: Boolean, default: false }, // <-- Add this line
+});
+
 app.listen(port, (error) => {
     if (!error) {
         console.log("Server is running on port " + port);
@@ -341,3 +348,4 @@ app.listen(port, (error) => {
         console.log("Error: " + error);
     }
 });
+

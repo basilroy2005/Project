@@ -16,8 +16,14 @@ const [cartItems,setCartItems] = useState(getDefaultCart());
 
 useEffect(() => {
   fetch('http://localhost:4000/allproducts')
-    .then((response) => response.json())
-    .then((data) => setAll_Product(data));
+    .then((response) => response.text())
+    .then((text) => {
+      if (text) {
+        setAll_Product(JSON.parse(text));
+      } else {
+        setAll_Product([]);
+      }
+    });
 
   if (localStorage.getItem('auth-token')) {
     fetch('http://localhost:4000/getcart', {
@@ -29,8 +35,14 @@ useEffect(() => {
       },
       body: "",
     })
-      .then((response) => response.json())
-      .then((data) => setCartItems(data));
+      .then((response) => response.text())
+      .then((text) => {
+        if (text) {
+          setCartItems(JSON.parse(text));
+        } else {
+          setCartItems(getDefaultCart());
+        }
+      });
   }
 
   // Poll for product updates every 5 seconds

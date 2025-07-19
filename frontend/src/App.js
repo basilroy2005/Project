@@ -1,4 +1,3 @@
-
 import './App.css';
 import Navbar from './Components/Navbar/Navbar.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -13,6 +12,7 @@ import women_banner from './Components/Assets/banner_women.png'
 import kid_banner from './Components/Assets/banner_kids.png'
 import Buy from './Pages/Buy.jsx';
 import Profile from './Pages/Profile.jsx';
+import Admin from './Pages/Admin.jsx'; // <-- Update import
 function App() {
   return (
     <div>
@@ -31,6 +31,7 @@ function App() {
           <Route path='/login' element={<LoginSignup />} />
 <Route path='/buy' element={<Buy/>} />
 <Route path='/profile' element={<Profile/>} />
+<Route path='/admin' element={<Admin />} /> {/* <-- Add this line */}
         </Routes>
 
         <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/> <br/>
@@ -42,4 +43,3 @@ function App() {
 }
 
 export default App;
- 

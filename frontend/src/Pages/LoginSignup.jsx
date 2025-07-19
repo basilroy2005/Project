@@ -16,31 +16,37 @@ setFormData({...formData,[e.target.name]:e.target.value})
 
 
 
-const login = async ()=>{
-console.log("Login Function Executed",formData)
-
-let responseData
-await fetch('http://localhost:4000/login',{
-  method:'POST',
-  headers:{
-    Accept:'application/form-data',
-    'Content-Type':'application/json',
-  },
-  body:JSON.stringify(formData),
-}).then((response)=> response.json()).then((data)=>responseData=data)
-
-
-if(responseData.success){
-  localStorage.setItem('auth-token',responseData.token);
-  window.location.replace("/");
-}
-else{
-  alert(responseData.errors)
-}
-
-
-
-
+const login = async () => {
+  let responseData;
+  const response = await fetch('http://localhost:4000/login', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/form-data',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+  if (response.ok) {
+    const text = await response.text();
+    if (text) {
+      responseData = JSON.parse(text);
+      if (responseData.success) {
+        localStorage.setItem('auth-token', responseData.token);
+        localStorage.setItem('isAdmin', responseData.isAdmin); // <-- Add this line
+        if (responseData.isAdmin) {
+          window.location.href = 'http://localhost:5173/';
+        } else {
+          window.location.href = '/';
+        }
+      } else {
+        alert(responseData.errors);
+      }
+    } else {
+      alert("Empty response from server.");
+    }
+  } else {
+    alert("Server error. Please try again.");
+  }
 }
 
 const signup = async ()=>{

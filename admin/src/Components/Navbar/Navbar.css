@@ -13,4 +13,17 @@
 .nav-profile{
       width:75px;
 }
+.navbar button {
+  margin-left: 20px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  background: #ff4141;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.navbar button:hover {
+  background: #d32f2f;
+}
 

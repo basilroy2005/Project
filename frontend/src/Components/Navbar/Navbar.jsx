@@ -1,4 +1,3 @@
-
 import './Navbar.css'
 import logo from '../Assets/logo.png'
 import cart_icon from '../Assets/cart_icon.png'
@@ -24,18 +23,29 @@ const {getTotalCartItems}=useContext(ShopContext);
       <li onClick={() => { setMenu("kids") }}><Link style={{ textDecoration: 'none'}} to='/kids'>Kids</Link>{menu === "kids" ? <hr /> : <></>}</li>
 </ul>
 <div className="nav-login-cart">
+  {localStorage.getItem('auth-token')
+    ? <button onClick={() => {
+        localStorage.removeItem('auth-token');
+        localStorage.removeItem('isAdmin'); // Remove admin flag on logout
+        window.location.replace('/');
+      }}>Logout</button>
+    : <Link to='/login'><button>Login</button></Link>
+  }
 
   {localStorage.getItem('auth-token')
-    ?<button onClick={()=>{localStorage.removeItem('auth-token');window.location.replace('/')}}>Logout</button> 
-  :<Link to='/login'><button>Login</button></Link>}
+    ? <Link to='/profile'><button>Profile</button></Link>
+    : null
+  }
 
-{localStorage.getItem('auth-token')
-?<Link to='profile'><button>Profile</button></Link>
-: <></>}
-     
-      <Link to='/cart'><img src={cart_icon} alt="Cart"/></Link>
-      <div className="nav-cart-count">{getTotalCartItems()}</div>
-      </div>
+  {/* Show Admin Panel button only if isAdmin is true */}
+  {localStorage.getItem('auth-token') && localStorage.getItem('isAdmin') === 'true'
+    ? <a href="http://localhost:5173/"><button>Admin</button></a>
+    : null
+  }
+
+  <Link to='/cart'><img src={cart_icon} alt="Cart"/></Link>
+  <div className="nav-cart-count">{getTotalCartItems()}</div>
+</div>
     </div>
   ) 
 }
